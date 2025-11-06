@@ -216,6 +216,11 @@ function Install-EdFiOdsAdminApi {
         [switch]
         $NoDuration,
 
+        #Encryption key
+        [string]
+         [Parameter(Mandatory=$true)]
+        $EncryptionKey,
+
         # Deploy Admin Api with MultiTenant support.
         # Passing this flag, requires to pass Tenants configuration.
         # When true, this flag will enable the MultiTenancy flag in Appsettings.
@@ -268,6 +273,7 @@ function Install-EdFiOdsAdminApi {
         AdminDbConnectionInfo = $AdminDbConnectionInfo
         SecurityDbConnectionInfo = $SecurityDbConnectionInfo
         AuthenticationSettings = $AuthenticationSettings
+        EncryptionKey= $EncryptionKey
         NoDuration = $NoDuration
         IsMultiTenant = $IsMultiTenant.IsPresent
         Tenants = $Tenants
@@ -757,6 +763,7 @@ function Invoke-TransferAppsettings {
         $newSettings = Get-Content $newSettingsFile | ConvertFrom-Json | ConvertTo-Hashtable
 
         $newSettings.AppSettings.DatabaseEngine = $oldSettings.AppSettings.DatabaseEngine
+        $newSettings.AppSettings.EncryptionKey = $oldSettings.AppSettings.EncryptionKey
         $newSettings.AppSettings.ApiStartupType = $oldSettings.AppSettings.ApiStartupType
         $newSettings.AppSettings.ApiExternalUrl =  $oldSettings.AppSettings.ApiExternalUrl
         $newSettings.AppSettings.PathBase = $oldSettings.AppSettings.PathBase
@@ -954,7 +961,8 @@ function Invoke-TransformAppSettings {
         $settingsFile = Join-Path $Config.WebConfigLocation "appsettings.json"
         $settings = Get-Content $settingsFile | ConvertFrom-Json | ConvertTo-Hashtable
         $settings.AppSettings.DatabaseEngine = $config.engine
-
+        $settings.AppSettings.EncryptionKey = $config.EncryptionKey
+        
         $settings.AppSettings.MultiTenancy = $config.IsMultiTenant
 
         $missingAuthenticationSettings = @()
